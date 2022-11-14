@@ -6,10 +6,10 @@
 \usage{
 write_bed_records(
   bed_records = NULL,
-  otput_dir = NA,
+  output_dir = NA,
   bed_fname_prefix = NA,
   genome_build = "grch37",
-  fseparator = "_",
+  fsep = "_",
   chrom_col = "chrom",
   start_col = "start",
   end_col = "end",
@@ -20,11 +20,13 @@ write_bed_records(
 \item{bed_records}{data frame with column names and data similar to
 mandatory BED columns (CHROM, START, END etc)}
 
+\item{output_dir}{output directory for VCF file}
+
 \item{bed_fname_prefix}{VCF file name prefix}
 
 \item{genome_build}{human genome build (grch37/grch38)}
 
-\item{fseparator}{separator symbol to use in filenames}
+\item{fsep}{separator symbol to use in filenames}
 
 \item{chrom_col}{name of chromosome column}
 
@@ -34,8 +36,6 @@ mandatory BED columns (CHROM, START, END etc)}
 
 \item{keep_uncompressed}{logical indicating if uncompressed BED file should
 be kept}
-
-\item{output_dir}{output directory for VCF file}
 }
 \description{
 Sort and write BED records to file

@@ -181,17 +181,17 @@ crossmap_bed <- function(
     }
   }
 
-  source_records <- read.table(file = source_bed, sep = "\t", quote = "")
+  source_records <- utils::read.table(file = source_bed, sep = "\t", quote = "")
 
   if (direction == "hg19Tohg38") {
     source_records$V1 <- stringr::str_replace_all(
       paste0('chr', source_records$V1), 'chrchr', 'chr')
-    write.table(source_records, file = tmp_bed_file[['3']],
+    utils::write.table(source_records, file = tmp_bed_file[['3']],
                 quote = F, row.names = F, col.names = F)
   }else{
     source_records$V1 <- stringr::str_replace_all(
       source_records$V1, 'chr', '')
-    write.table(source_records, file = tmp_bed_file[['3']],
+    utils::write.table(source_records, file = tmp_bed_file[['3']],
                 quote = F, row.names = F, col.names = F)
   }
 

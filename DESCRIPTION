@@ -2,7 +2,7 @@ Package: vcfhelpR
 Type: Package
 Title: Functions to order, write and crossmap VCF/BED records in R 
 Version: 0.2.1
-Date: 2022-11-12
+Date: 2022-11-14
 Authors@R: 
     c(person(given = "Sigve",
              family = "Nakken",
@@ -10,9 +10,9 @@ Authors@R:
              email = "sigven@ifi.uio.no",
              comment = c(ORCID = "0000-0001-8468-2050")))
 Maintainer: Sigve Nakken <sigven@ifi.uio.no>
-Description: A few utilities for sorting, validating, and 
-   writing VCF data frame records to a compressed and 
-   tabix-index VCF file.
+Description: A few utilities for sorting, writing and 
+   cross-mapping VCF/BED data frame records to compressed and 
+   tabix-index VCF/BED files.
 License: MIT + file LICENSE
 URL: https://github.com/sigven/vcfhelpR
 BugReports: https://github.com/sigven/vcfhelpR/issues
@@ -29,6 +29,6 @@ Suggests:
     knitr,
     rmarkdown
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3

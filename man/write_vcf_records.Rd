@@ -9,9 +9,10 @@ write_vcf_records(
   output_dir = NULL,
   header_lines = NULL,
   vcf_fname_prefix = NULL,
-  fseparator = "_",
+  fsep = "_",
   genome_build = "grch38",
   sample_names = NULL,
+  keep_uncompressed = F,
   validate = F
 )
 }
@@ -24,11 +25,13 @@ write_vcf_records(
 
 \item{vcf_fname_prefix}{VCF file name prefix}
 
-\item{fseparator}{separator symbol to use in filenames}
+\item{fsep}{separator symbol to use in filenames}
 
 \item{genome_build}{human genome build (grch37/grch38)}
 
 \item{sample_names}{sample names for genotype columns}
+
+\item{keep_uncompressed}{logical indicating if uncompressed output is kept}
 
 \item{validate}{logical indicating if vcf-validator should be run on final VCF file}
 }
