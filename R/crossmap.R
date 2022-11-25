@@ -92,10 +92,12 @@ crossmap_vcf <- function(
                 ' | egrep -v \"^#\" | egrep \"^[XYM]\" ',
                 '| sort -k1,1 -k2,2n -k4,4 -k5,5 >> ',
                 tmp_vcf_file[['3']]))
-  system(paste0("awk 'BEGIN{FS=\"\t\"}{if (NF == 8)print;}' ",
-                tmp_vcf_file[['3']],
-                " | awk '!seen[$2,$4,$5]++' >> ",
+  system(paste0('cat ',tmp_vcf_file[['3']], ' >> ',
                 target_vcf))
+  # system(paste0("awk 'BEGIN{FS=\"\t\"}{if (NF == 8)print;}' ",
+  #               tmp_vcf_file[['3']],
+  #               " | awk '!seen[$2,$4,$5]++' >> ",
+  #               target_vcf))
   system(paste0('bgzip -f -c ',
                 target_vcf,' > ',
                 target_vcf,'.gz'))
