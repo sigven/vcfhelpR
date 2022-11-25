@@ -205,7 +205,7 @@ crossmap_bed <- function(
   system(paste0('egrep -v \'^##(lift|new)\' ',
                 tmp_bed_file[['1']],
                 ' | sed \'s/^chr//\' | ',
-                'egrep -v \'Un|_alt|random\' > ',
+                'egrep -v \'Un_|_random|_alt|_hap[0-9]\' > ',
                 tmp_bed_file[['2']]))
   system(paste0('egrep \'^#\' ',tmp_bed_file[['2']],' > ',target_bed))
   system(paste0('cat ',tmp_bed_file[['2']],
