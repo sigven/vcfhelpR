@@ -177,6 +177,10 @@ order_bed_records <- function(
           bed_records_final, chrom_regions_sorted)
     }
   }
+
+  bed_records_final <- bed_records_final |>
+    dplyr::filter(!is.na(chrom))
+
   return(bed_records_final)
 }
 
