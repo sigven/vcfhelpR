@@ -63,7 +63,7 @@ write_bed_records <- function(
     end_col = end_col)
 
   bed_fname <- list()
-  ## Specify full path for VCF records file and VCF file
+  ## Specify full path for BED records file and BED file
   bed_fname[['final']] <-
     file.path(
       output_dir,
@@ -87,7 +87,7 @@ write_bed_records <- function(
                 bed_fname[['final']],
                 ".gz"))
 
-  system(paste0("tabix -p vcf ",
+  system(paste0("tabix -p bed ",
                 bed_fname[['final']],
                 ".gz"))
 
