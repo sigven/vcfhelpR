@@ -16,6 +16,8 @@
 #' @param keep_uncompressed logical indicating if uncompressed BED file should
 #' be kept
 #'
+#' @return output file names (raw + bgzipped)
+#'
 #' @export
 #'
 #'
@@ -74,6 +76,8 @@ write_bed_records <- function(
       ))
 
 
+  options(scipen = 999)
+
   utils::write.table(bed_records,
                      file = bed_fname[['final']],
                      sep = "\t",
@@ -102,11 +106,20 @@ write_bed_records <- function(
     "Output index file: ",
     basename(bed_fname[['final']]), ".gz.tbi"))
 
+
+  output_fnames <- list()
+  output_fnames[['bed_bgzip']] <-
+    paste0(bed_fname$final, ".gz")
+  output_fnames[['bed_raw']] <- bed_fname$final
+
   if (keep_uncompressed == F) {
     system(
       paste0("rm -f ", bed_fname[['final']]))
+    output_fnames[['bed_raw']] <- NULL
+
   }
 
+  return(output_fnames)
 
 }
 
@@ -241,6 +254,8 @@ order_vcf_records <- function(
 #' @param sample_names sample names for genotype columns
 #' @param keep_uncompressed logical indicating if uncompressed output is kept
 #' @param validate logical indicating if vcf-validator should be run on final VCF file
+#'
+#' @return locations of raw + bgzipped VCF file
 #' @export
 #'
 
@@ -621,11 +636,21 @@ write_vcf_records <- function(
     "Output index file: ",
     basename(vcf_fname[['final']]), ".gz.tbi"))
 
+
+  output_fnames <- list()
+  output_fnames[['vcf_bgzip']] <-
+    paste0(vcf_fname$final, ".gz")
+  output_fnames[['vcf_raw']] <- vcf_fname$final
+
+
   if (keep_uncompressed == F){
     system(
       paste0("rm -f ", vcf_fname[['final']]))
+    output_fnames[['vcf_raw']] <- NULL
+
   }
 
+  return(output_fnames)
 
 }
 

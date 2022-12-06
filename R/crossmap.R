@@ -115,7 +115,7 @@ crossmap_vcf <- function(
 #'
 #' @description
 #' Function that "lifts" the BED records to a different
-#' assembly version of the human genome, using CrossMap.py
+#' assembly version of the human genome, using CrossMap.py region
 #'
 #' @param direction hg38Tohg19 or hg19Tohg38
 #' @param crossmap_cmd_path Full path to CrossMap.py file
@@ -123,6 +123,8 @@ crossmap_vcf <- function(
 #' @param wdir working directory
 #' @param debug logical indicating if debug mode is on or off
 #' @param fsep file name separator (default '_')
+#' @param remap_ratio Minimum ratio of bases that must remap
+#' (CrossMap.py region -r <remap_ratio>)
 #' @param source_bed BED file to be lifted
 #' @param target_bed BED file with lifted coordinates
 #'
@@ -135,6 +137,7 @@ crossmap_bed <- function(
     wdir = NULL,
     debug = FALSE,
     fsep = '_',
+    remap_ratio = 0.9,
     source_bed = NULL,
     target_bed = NULL) {
 
@@ -183,22 +186,36 @@ crossmap_bed <- function(
     }
   }
 
-  source_records <- utils::read.table(file = source_bed, sep = "\t", quote = "")
+  source_records <- utils::read.table(
+    file = source_bed, sep = "\t", quote = "")
+
+  ncol_bed <- ncol(source_records)
 
   if (direction == "hg19Tohg38") {
     source_records$V1 <- stringr::str_replace_all(
       paste0('chr', source_records$V1), 'chrchr', 'chr')
-    utils::write.table(source_records, file = tmp_bed_file[['3']],
-                quote = F, row.names = F, col.names = F)
+    utils::write.table(
+      source_records,
+      file = tmp_bed_file[['3']],
+      quote = F,
+      row.names = F,
+      col.names = F)
   }else{
     source_records$V1 <- stringr::str_replace_all(
       source_records$V1, 'chr', '')
-    utils::write.table(source_records, file = tmp_bed_file[['3']],
-                quote = F, row.names = F, col.names = F)
+    utils::write.table(
+      source_records,
+      file = tmp_bed_file[['3']],
+      quote = F,
+      row.names = F,
+      col.names = F)
   }
 
-  system(paste0(crossmap_cmd_path,' region -r 0.8 ',
-                chainFile,' ', tmp_bed_file[['3']],
+  system(paste0(crossmap_cmd_path,
+                ' region -r ',
+                remap_ratio, ' ',
+                chainFile,' ',
+                tmp_bed_file[['3']],
                 ' ', tmp_bed_file[['1']]))
 
   #tmp_bed_file[['2']]
@@ -207,14 +224,15 @@ crossmap_bed <- function(
                 ' | sed \'s/^chr//\' | ',
                 'egrep -v \'Un_|_random|_alt|_hap[0-9]\' > ',
                 tmp_bed_file[['2']]))
-  system(paste0('egrep \'^#\' ',tmp_bed_file[['2']],' > ',target_bed))
   system(paste0('cat ',tmp_bed_file[['2']],
                 ' | egrep -v \"^#\" | egrep -v \"^[XYM]\" ',
-                '| sort -k1,1n -k2,2n -k3,3n >> ',
+                '| sort -k1,1n -k2,2n -k3,3n ',
+                '| cut -f1-', ncol_bed, ' > ',
                 target_bed))
   system(paste0('cat ',tmp_bed_file[['2']],
                 ' | egrep -v \"^#\" | egrep \"^[XYM]\" ',
-                '| sort -k1,1 -k2,2n -k3,3n >> ',
+                '| sort -k1,1 -k2,2n -k3,3n ',
+                '| cut -f1-', ncol_bed, ' >> ',
                 target_bed))
   system(paste0('bgzip -f -c ',target_bed,' > ',target_bed,'.gz'))
   system(paste0('tabix -f -p bed ',target_bed,'.gz'))
