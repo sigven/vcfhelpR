@@ -20,9 +20,9 @@ write_bed_records(
 \item{bed_records}{data frame with column names and data similar to
 mandatory BED columns (CHROM, START, END etc)}
 
-\item{output_dir}{output directory for VCF file}
+\item{output_dir}{output directory for BED file}
 
-\item{bed_fname_prefix}{VCF file name prefix}
+\item{bed_fname_prefix}{BED file name prefix}
 
 \item{genome_build}{human genome build (grch37/grch38)}
 
@@ -36,6 +36,13 @@ mandatory BED columns (CHROM, START, END etc)}
 
 \item{keep_uncompressed}{logical indicating if uncompressed BED file should
 be kept}
+
+\item{name_col}{name of name column}
+
+\item{score_col}{name of score column}
+}
+\value{
+output file names (raw + bgzipped)
 }
 \description{
 Sort and write BED records to file

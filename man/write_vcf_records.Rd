@@ -35,6 +35,9 @@ write_vcf_records(
 
 \item{validate}{logical indicating if vcf-validator should be run on final VCF file}
 }
+\value{
+locations of raw + bgzipped VCF file
+}
 \description{
 Validate, sort and write VCF records to file
 }

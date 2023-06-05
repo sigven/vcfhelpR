@@ -11,6 +11,7 @@ crossmap_bed(
   wdir = NULL,
   debug = FALSE,
   fsep = "_",
+  remap_ratio = 0.9,
   source_bed = NULL,
   target_bed = NULL
 )
@@ -28,11 +29,14 @@ crossmap_bed(
 
 \item{fsep}{file name separator (default '_')}
 
+\item{remap_ratio}{Minimum ratio of bases that must remap
+(CrossMap.py region -r <remap_ratio>)}
+
 \item{source_bed}{BED file to be lifted}
 
 \item{target_bed}{BED file with lifted coordinates}
 }
 \description{
 Function that "lifts" the BED records to a different
-assembly version of the human genome, using CrossMap.py
+assembly version of the human genome, using CrossMap.py region
 }

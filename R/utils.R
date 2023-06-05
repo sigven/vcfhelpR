@@ -6,13 +6,16 @@
 #'
 #' @param bed_records data frame with column names and data similar to
 #' mandatory BED columns (CHROM, START, END etc)
-#' @param output_dir output directory for VCF file
-#' @param bed_fname_prefix VCF file name prefix
+#' @param output_dir output directory for BED file
+#' @param bed_fname_prefix BED filename prefix
 #' @param genome_build human genome build (grch37/grch38)
+#' @param genome_build_in_fname add genome build to output BED filename
 #' @param fsep separator symbol to use in filenames
 #' @param chrom_col name of chromosome column
 #' @param start_col name of start column
 #' @param end_col name of end column
+#' @param name_col name of name column
+#' @param score_col name of score column
 #' @param keep_uncompressed logical indicating if uncompressed BED file should
 #' be kept
 #'
@@ -26,6 +29,7 @@ write_bed_records <- function(
     output_dir = NA,
     bed_fname_prefix = NA,
     genome_build = "grch37",
+    genome_build_in_fname = TRUE,
     fsep = "_",
     chrom_col = "chrom",
     start_col = "start",
@@ -42,6 +46,7 @@ write_bed_records <- function(
   assertable::assert_colnames(
     bed_records, c(chrom_col, start_col, end_col),
     only_colnames = F, quiet = T)
+
   if (nrow(bed_records) == 0) {
     return(bed_records)
   }
@@ -74,6 +79,16 @@ write_bed_records <- function(
         fsep,
         genome_build, ".bed"
       ))
+
+  if(genome_build_in_fname == F){
+    bed_fname[['final']] <-
+      file.path(
+        output_dir,
+        paste0(
+          bed_fname_prefix,
+          ".bed"
+        ))
+  }
 
 
   options(scipen = 999)

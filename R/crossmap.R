@@ -62,6 +62,11 @@ crossmap_vcf <- function(
                           source_vcf,') does not exist'))
   }
 
+  if(direction == "hg19Tohg38"){
+    target_genome_file = '/Users/sigven/research/DB/hg38/hg38.fa'
+  }
+
+
   ## make temporary VCF file (with random index)
   tmp_vcf_file <- list()
   rand_index <- floor(stats::runif(3, min = 0, max = 1000000))

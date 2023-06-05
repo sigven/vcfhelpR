@@ -1,8 +1,8 @@
 Package: vcfhelpR
 Type: Package
 Title: Functions to order, write and crossmap VCF/BED records in R 
-Version: 0.3.3
-Date: 2022-12-06
+Version: 0.3.4
+Date: 2023-06-05
 Authors@R: 
     c(person(given = "Sigve",
              family = "Nakken",
@@ -29,6 +29,6 @@ Suggests:
     knitr,
     rmarkdown
 Encoding: UTF-8
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
