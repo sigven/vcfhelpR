@@ -265,6 +265,7 @@ order_vcf_records <- function(
 #' @param header_lines character vector with VCF header lines
 #' @param vcf_fname_prefix VCF file name prefix
 #' @param genome_build human genome build (grch37/grch38)
+#' @param genome_build_in_fname add genome build to output VCF filename
 #' @param fsep separator symbol to use in filenames
 #' @param sample_names sample names for genotype columns
 #' @param keep_uncompressed logical indicating if uncompressed output is kept
@@ -281,6 +282,7 @@ write_vcf_records <- function(
     vcf_fname_prefix = NULL,
     fsep = "_",
     genome_build = "grch38",
+    genome_build_in_fname = TRUE,
     sample_names = NULL,
     keep_uncompressed = F,
     validate = F) {
@@ -553,20 +555,20 @@ write_vcf_records <- function(
 
 
   lgr::lgr$info(
-    paste0("Found n = ",
-            NROW(vcf_records), " VCF records in input data frame")
+    glue::glue("Found n = {NROW(vcf_records)} VCF records ",
+               "in input data frame")
   )
   lgr::lgr$info(
-    paste0("Number of SVNs: ", vartype_stats[['n_snv']])
+    glue::glue("Number of SVNs: {vartype_stats[['n_snv']]}")
   )
   lgr::lgr$info(
-    paste0("Number of MNVs: ", vartype_stats[['n_mnv']])
+    glue::glue("Number of MNVs: {vartype_stats[['n_mnv']]}")
   )
   lgr::lgr$info(
-    paste0("Number of deletions: ", vartype_stats[['n_del']])
+    glue::glue("Number of deletions: {vartype_stats[['n_del']]}")
   )
   lgr::lgr$info(
-    paste0("Number of insertions: ", vartype_stats[['n_ins']])
+    glue::glue("Number of insertions: {vartype_stats[['n_ins']]}")
   )
 
   ## Order VCFF records according to chrom and pos
@@ -580,11 +582,20 @@ write_vcf_records <- function(
 
   ## Specify full path for VCF records file and VCF file
   vcf_fname[['final']] <-
-    file.path(output_dir, paste0(
-      vcf_fname_prefix,
-      fsep,
-      genome_build, ".vcf"
-    ))
+    file.path(
+      output_dir,
+      glue::glue(
+        "{vcf_fname_prefix}{fsep}{genome_build}.vcf")
+    )
+
+  if(genome_build_in_fname == F){
+    vcf_fname[['final']] <-
+      file.path(
+        output_dir,
+        glue::glue(
+          "{vcf_fname_prefix}.vcf")
+      )
+  }
 
 
   ## Check VCF header lines

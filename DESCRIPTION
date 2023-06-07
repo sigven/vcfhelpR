@@ -2,7 +2,7 @@ Package: vcfhelpR
 Type: Package
 Title: Functions to order, write and crossmap VCF/BED records in R 
 Version: 0.3.4
-Date: 2023-06-05
+Date: 2023-06-07
 Authors@R: 
     c(person(given = "Sigve",
              family = "Nakken",
@@ -23,6 +23,7 @@ Imports: dplyr,
          assertable,
          rlang,
          lgr,
+         glue,
          assertthat
 Suggests: 
     testthat (>= 3.1.0),
