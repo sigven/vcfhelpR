@@ -53,8 +53,10 @@ write_bed_records <- function(
 
   lgr::lgr$appenders$console$set_layout(
     lgr::LayoutFormat$new(
-      fmt = "%t [%L]  %m %j",
+      #fmt = "%t [%L]  %m %j",
       timestamp_fmt = "%Y-%m-%d %T"))
+
+  timestamp_fmt = "%Y-%m-%d %T"
 
   stopifnot(!is.na(bed_fname_prefix))
   stopifnot(!is.na(output_dir))
@@ -289,7 +291,7 @@ write_vcf_records <- function(
 
   lgr::lgr$appenders$console$set_layout(
     lgr::LayoutFormat$new(
-      fmt = "%t [%L]  %m %j",
+      #fmt = "%t [%L]  %m %j",
       timestamp_fmt = "%Y-%m-%d %T"))
 
   stopifnot(!is.null(header_lines))
