@@ -70,7 +70,7 @@ crossmap_vcf <- function(
   ## make temporary VCF file (with random index)
   tmp_vcf_file <- list()
   rand_index <- floor(stats::runif(3, min = 0, max = 1000000))
-  for (i in 1:3) {
+  for (i in 1:2) {
     tmp_vcf_file[[as.character(i)]] <-
       paste0(paste('tmp','crossmapr',rand_index[i],
                    sep = fsep),'.vcf')
@@ -85,32 +85,83 @@ crossmap_vcf <- function(
   }
   system(cmd)
 
-  system(paste0('egrep -v \'^##(lift|new|contig)\' ',tmp_vcf_file[['1']],
-                ' | sed \'s/^chr//\' | egrep -v \'Un_|_random|_alt|_hap[0-9]\' > ',
-                tmp_vcf_file[['2']]))
-  system(paste0('egrep \'^#\' ',tmp_vcf_file[['2']],' > ',target_vcf))
-  system(paste0('cat ',tmp_vcf_file[['2']],
-                ' | egrep -v \"^#\" | egrep -v \"^[XYM]\" ',
-                '| sort -k1,1n -k2,2n -k4,4 -k5,5 >> ',
-                tmp_vcf_file[['3']]))
-  system(paste0('cat ',tmp_vcf_file[['2']],
-                ' | egrep -v \"^#\" | egrep \"^[XYM]\" ',
-                '| sort -k1,1 -k2,2n -k4,4 -k5,5 >> ',
-                tmp_vcf_file[['3']]))
-  system(paste0('cat ',tmp_vcf_file[['3']], ' >> ',
-                target_vcf))
-  # system(paste0("awk 'BEGIN{FS=\"\t\"}{if (NF == 8)print;}' ",
-  #               tmp_vcf_file[['3']],
-  #               " | awk '!seen[$2,$4,$5]++' >> ",
+  vcf_header_lines <-
+    readLines(file(tmp_vcf_file[['1']]))
+
+  vcf_header_lines <-
+    vcf_header_lines[
+      stringr::str_detect(vcf_header_lines,
+                          "^##") &
+        !stringr::str_detect(
+          vcf_header_lines,
+          "^##(liftOver|contig|originalFile|targetRefGenome)")]
+
+  variants <- as.data.frame(
+    readr::read_tsv(
+      tmp_vcf_file[['1']],
+      comment = "#", show_col_types = F,
+      col_names = F)) |>
+
+    ## ignore indels that are not properly left-aligned
+    dplyr::filter(
+      nchar(X4) == nchar(X5) |
+        (nchar(X4) != nchar(X5) &
+           substr(X4,1,1) == substr(X5,1,1)))
+
+
+  variant_set <- variants |>
+    dplyr::mutate(X1 = stringr::str_replace(X1,"chr","")) |>
+    dplyr::filter(!stringr::str_detect(X1,"Un_|_random|_alt|_hap[0-9]")) |>
+    dplyr::mutate(mut_id = paste(X1,X2,X4,X5, sep="_"))
+
+  duplicated_variants <-
+    plyr::count(variant_set$mut_id) |>
+    dplyr::filter(freq > 1)
+
+  variant_set_clean <- variant_set |>
+    dplyr::anti_join(
+      dplyr::select(duplicated_variants, x),
+      by = c("mut_id" = "x")) |>
+    dplyr::select(-mut_id) |>
+    dplyr::rename(
+      CHROM = X1, POS = X2, ID = X3,
+      REF = X4, ALT = X5, QUAL = X6,
+      FILTER = X7,
+      INFO = X8)
+
+
+  write_vcf_records(
+    vcf_records = variant_set_clean,
+    header_lines = vcf_header_lines,
+    output_dir = dirname(target_vcf),
+    genome_build_in_fname = F,
+    vcf_fname_prefix = stringr::str_replace(
+      basename(target_vcf),"\\.vcf","")
+    )
+
+
+  # system(paste0('egrep -v \'^##(lift|new|contig)\' ',tmp_vcf_file[['1']],
+  #               ' | sed \'s/^chr//\' | egrep -v \'Un_|_random|_alt|_hap[0-9]\' > ',
+  #               tmp_vcf_file[['2']]))
+  # system(paste0('egrep \'^#\' ',tmp_vcf_file[['2']],' > ',target_vcf))
+  # system(paste0('cat ',tmp_vcf_file[['2']],
+  #               ' | egrep -v \"^#\" | egrep -v \"^[XYM]\" ',
+  #               '| sort -k1,1n -k2,2n -k4,4 -k5,5 >> ',
+  #               tmp_vcf_file[['3']]))
+  # system(paste0('cat ',tmp_vcf_file[['2']],
+  #               ' | egrep -v \"^#\" | egrep \"^[XYM]\" ',
+  #               '| sort -k1,1 -k2,2n -k4,4 -k5,5 >> ',
+  #               tmp_vcf_file[['3']]))
+  # system(paste0('cat ',tmp_vcf_file[['3']], ' >> ',
   #               target_vcf))
-  system(paste0('bgzip -f -c ',
-                target_vcf,' > ',
-                target_vcf,'.gz'))
-  system(paste0('tabix -f -p vcf ',target_vcf,'.gz'))
-  system(paste0('rm -f ', target_vcf))
+  # system(paste0('bgzip -f -c ',
+  #               target_vcf,' > ',
+  #               target_vcf,'.gz'))
+  # system(paste0('tabix -f -p vcf ',target_vcf,'.gz'))
+  # system(paste0('rm -f ', target_vcf))
   system(paste0('rm -f ',tmp_vcf_file[['1']],'*'))
   system(paste0('rm -f ',tmp_vcf_file[['2']],'*'))
-  system(paste0('rm -f ',tmp_vcf_file[['3']],'*'))
+  # system(paste0('rm -f ',tmp_vcf_file[['3']],'*'))
 
   lgr::lgr$info(paste0("Crossmapped VCF file: ", target_vcf,".gz"))
 
