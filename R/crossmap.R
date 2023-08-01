@@ -66,27 +66,25 @@ crossmap_vcf <- function(
     target_genome_file = '/Users/sigven/research/DB/hg38/hg38.fa'
   }
 
-
   ## make temporary VCF file (with random index)
-  tmp_vcf_file <- list()
-  rand_index <- floor(stats::runif(3, min = 0, max = 1000000))
-  for (i in 1:2) {
-    tmp_vcf_file[[as.character(i)]] <-
-      paste0(paste('tmp','crossmapr',rand_index[i],
-                   sep = fsep),'.vcf')
-  }
+  rand_index <- floor(stats::runif(1, min = 0, max = 100000000))
+  tmp_vcf_file <- paste0(
+    paste0('tmp','crossmapr',rand_index, sep = fsep),
+    '.vcf')
 
   cmd <- paste0(crossmap_cmd_path,' vcf ',
                 chainFile,' ',source_vcf,' ',
                 target_genome_file,' ',
-                tmp_vcf_file[['1']])
+                tmp_vcf_file)
   if (verbose == T) {
     lgr::lgr$info(paste0("Command: ", cmd))
   }
   system(cmd)
 
+  con <- file(tmp_vcf_file)
   vcf_header_lines <-
-    readLines(file(tmp_vcf_file[['1']]))
+    readLines(con = con)
+  close(con)
 
   vcf_header_lines <-
     vcf_header_lines[
@@ -98,7 +96,7 @@ crossmap_vcf <- function(
 
   variants <- as.data.frame(
     readr::read_tsv(
-      tmp_vcf_file[['1']],
+      tmp_vcf_file,
       comment = "#", show_col_types = F,
       col_names = F)) |>
 
@@ -129,7 +127,6 @@ crossmap_vcf <- function(
       FILTER = X7,
       INFO = X8)
 
-
   write_vcf_records(
     vcf_records = variant_set_clean,
     header_lines = vcf_header_lines,
@@ -139,29 +136,7 @@ crossmap_vcf <- function(
       basename(target_vcf),"\\.vcf","")
     )
 
-
-  # system(paste0('egrep -v \'^##(lift|new|contig)\' ',tmp_vcf_file[['1']],
-  #               ' | sed \'s/^chr//\' | egrep -v \'Un_|_random|_alt|_hap[0-9]\' > ',
-  #               tmp_vcf_file[['2']]))
-  # system(paste0('egrep \'^#\' ',tmp_vcf_file[['2']],' > ',target_vcf))
-  # system(paste0('cat ',tmp_vcf_file[['2']],
-  #               ' | egrep -v \"^#\" | egrep -v \"^[XYM]\" ',
-  #               '| sort -k1,1n -k2,2n -k4,4 -k5,5 >> ',
-  #               tmp_vcf_file[['3']]))
-  # system(paste0('cat ',tmp_vcf_file[['2']],
-  #               ' | egrep -v \"^#\" | egrep \"^[XYM]\" ',
-  #               '| sort -k1,1 -k2,2n -k4,4 -k5,5 >> ',
-  #               tmp_vcf_file[['3']]))
-  # system(paste0('cat ',tmp_vcf_file[['3']], ' >> ',
-  #               target_vcf))
-  # system(paste0('bgzip -f -c ',
-  #               target_vcf,' > ',
-  #               target_vcf,'.gz'))
-  # system(paste0('tabix -f -p vcf ',target_vcf,'.gz'))
-  # system(paste0('rm -f ', target_vcf))
-  system(paste0('rm -f ',tmp_vcf_file[['1']],'*'))
-  system(paste0('rm -f ',tmp_vcf_file[['2']],'*'))
-  # system(paste0('rm -f ',tmp_vcf_file[['3']],'*'))
+  system(paste0('rm -f ',tmp_vcf_file,'*'))
 
   lgr::lgr$info(paste0("Crossmapped VCF file: ", target_vcf,".gz"))
 
