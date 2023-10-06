@@ -69,7 +69,7 @@ crossmap_vcf <- function(
   ## make temporary VCF file (with random index)
   rand_index <- floor(stats::runif(1, min = 0, max = 100000000))
   tmp_vcf_file <- paste0(
-    paste0('tmp','crossmapr',rand_index, sep = fsep),
+    paste('tmp','crossmapr',rand_index, sep = fsep),
     '.vcf')
 
   cmd <- paste0(crossmap_cmd_path,' vcf ',
