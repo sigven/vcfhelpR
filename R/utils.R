@@ -346,15 +346,7 @@ write_vcf_records <- function(
     only_colnames = F
   )
 
-  vcf_records <- vcf_records |>
-    dplyr::select(.data$CHROM,
-                  .data$POS,
-                  .data$ID,
-                  .data$REF,
-                  .data$ALT,
-                  .data$QUAL,
-                  .data$FILTER,
-                  .data$INFO)
+
 
   if(samples_found == T){
     vcf_records <- vcf_records |>
@@ -368,6 +360,16 @@ write_vcf_records <- function(
                     .data$INFO,
                     .data$FORMAT,
                     dplyr::any_of(sample_names))
+  }else{
+    vcf_records <- vcf_records |>
+      dplyr::select(.data$CHROM,
+                    .data$POS,
+                    .data$ID,
+                    .data$REF,
+                    .data$ALT,
+                    .data$QUAL,
+                    .data$FILTER,
+                    .data$INFO)
   }
 
   human_chromosomes <- data.frame(

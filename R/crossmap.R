@@ -92,46 +92,52 @@ crossmap_vcf <- function(
                           "^##") &
         !stringr::str_detect(
           vcf_header_lines,
-          "^##(liftOver|contig|originalFile|targetRefGenome)")]
+          "^##(contig|originalFile|targetRefGenome)")]
 
   variants <- as.data.frame(
     readr::read_tsv(
       tmp_vcf_file,
-      comment = "#", show_col_types = F,
-      col_names = F)) |>
+      comment = "##", show_col_types = F,
+      col_names = T)) |>
 
     ## ignore indels that are not properly left-aligned
     dplyr::filter(
-      nchar(X4) == nchar(X5) |
-        (nchar(X4) != nchar(X5) &
-           substr(X4,1,1) == substr(X5,1,1)))
+      nchar(REF) == nchar(ALT) |
+        (nchar(REF) != nchar(ALT) &
+           substr(REF,1,1) == substr(ALT,1,1)))
 
-
+  colnames(variants)[1] <- "CHROM"
   variant_set <- variants |>
-    dplyr::mutate(X1 = stringr::str_replace(X1,"chr","")) |>
-    dplyr::filter(!stringr::str_detect(X1,"Un_|_random|_alt|_hap[0-9]")) |>
-    dplyr::mutate(mut_id = paste(X1,X2,X4,X5, sep="_"))
+    dplyr::mutate(CHROM = stringr::str_replace(CHROM,"chr","")) |>
+    dplyr::filter(!stringr::str_detect(CHROM,"Un_|_random|_alt|_hap[0-9]")) |>
+    dplyr::mutate(mut_id = paste(CHROM,POS,REF,ALT, sep="_"))
 
   duplicated_variants <-
     plyr::count(variant_set$mut_id) |>
     dplyr::filter(freq > 1)
 
+  vcf_sample_names <- NULL
+  if(NCOL(variant_set) > 8){
+    if(colnames(variant_set)[9] == "FORMAT"){
+      if(NCOL(variant_set) > 9){
+        vcf_sample_names =
+          colnames(variants)[10:length(colnames(variants))]
+      }
+    }
+  }
+
   variant_set_clean <- variant_set |>
     dplyr::anti_join(
       dplyr::select(duplicated_variants, x),
       by = c("mut_id" = "x")) |>
-    dplyr::select(-mut_id) |>
-    dplyr::rename(
-      CHROM = X1, POS = X2, ID = X3,
-      REF = X4, ALT = X5, QUAL = X6,
-      FILTER = X7,
-      INFO = X8)
+    dplyr::select(-mut_id)
 
   write_vcf_records(
     vcf_records = variant_set_clean,
     header_lines = vcf_header_lines,
     output_dir = dirname(target_vcf),
     genome_build_in_fname = F,
+    sample_names = vcf_sample_names,
     vcf_fname_prefix = stringr::str_replace(
       basename(target_vcf),"\\.vcf","")
     )
