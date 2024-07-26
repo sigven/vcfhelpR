@@ -169,7 +169,7 @@ crossmap_vcf <- function(
 #'
 crossmap_bed <- function(
     direction = "hg38Tohg19",
-    crossmap_cmd_path = "/Users/sigven/miniconda3/envs/py36/bin/CrossMap.py",
+    crossmap_cmd_path = "/Users/sigven/miniconda3/bin/CrossMap.py",
     chain_file_directory = '/Users/sigven/research/DB/chainFiles',
     wdir = NULL,
     debug = FALSE,
