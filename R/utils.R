@@ -350,26 +350,17 @@ write_vcf_records <- function(
 
   if(samples_found == T){
     vcf_records <- vcf_records |>
-      dplyr::select(.data$CHROM,
-                    .data$POS,
-                    .data$ID,
-                    .data$REF,
-                    .data$ALT,
-                    .data$QUAL,
-                    .data$FILTER,
-                    .data$INFO,
-                    .data$FORMAT,
-                    dplyr::any_of(sample_names))
+      dplyr::select(
+        c("CHROM", "POS", "ID",
+          "REF", "ALT", "QUAL",
+          "FILTER", "INFO", "FORMAT"),
+        dplyr::any_of(sample_names))
   }else{
     vcf_records <- vcf_records |>
-      dplyr::select(.data$CHROM,
-                    .data$POS,
-                    .data$ID,
-                    .data$REF,
-                    .data$ALT,
-                    .data$QUAL,
-                    .data$FILTER,
-                    .data$INFO)
+      dplyr::select(
+        c("CHROM", "POS", "ID",
+          "REF", "ALT", "QUAL",
+          "FILTER", "INFO", "FORMAT"))
   }
 
   human_chromosomes <- data.frame(
@@ -526,7 +517,9 @@ write_vcf_records <- function(
     )
   }
 
-  stopifnot(NROW(vcf_records) > 0)
+  if(NROW(vcf_records) == 0){
+    return(0)
+  }
 
   vartype_stats <- list()
   vartype_stats[['n_snv']] <-

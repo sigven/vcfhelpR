@@ -18,7 +18,7 @@
 crossmap_vcf <- function(
     target_genome_file = '/Users/sigven/research/DB/hg19/ucsc.hg19.fa',
     direction = "hg38Tohg19",
-    crossmap_cmd_path = "/Users/sigven/miniconda3/bin/CrossMap.py",
+    crossmap_cmd_path = "/Users/sigven/miniconda3/bin/CrossMap",
     chain_file_directory = '/Users/sigven/research/DB/chainFiles',
     fsep = '_',
     source_vcf = NULL,
@@ -132,6 +132,11 @@ crossmap_vcf <- function(
       by = c("mut_id" = "x")) |>
     dplyr::select(-mut_id)
 
+  if(NROW(variant_set_clean) == 0){
+    lgr::lgr$warn("No variants left after removing duplicates")
+    return(0)
+  }
+
   write_vcf_records(
     vcf_records = variant_set_clean,
     header_lines = vcf_header_lines,
@@ -169,7 +174,7 @@ crossmap_vcf <- function(
 #'
 crossmap_bed <- function(
     direction = "hg38Tohg19",
-    crossmap_cmd_path = "/Users/sigven/miniconda3/bin/CrossMap.py",
+    crossmap_cmd_path = "/Users/sigven/miniconda3/bin/CrossMap",
     chain_file_directory = '/Users/sigven/research/DB/chainFiles',
     wdir = NULL,
     debug = FALSE,
