@@ -360,7 +360,7 @@ write_vcf_records <- function(
       dplyr::select(
         c("CHROM", "POS", "ID",
           "REF", "ALT", "QUAL",
-          "FILTER", "INFO", "FORMAT"))
+          "FILTER", "INFO"))
   }
 
   human_chromosomes <- data.frame(
